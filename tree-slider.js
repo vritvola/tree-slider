@@ -2,12 +2,10 @@ $(document).ready(function(){
 
 	// settings
 	var animationSpeed = 500;
-	var contentWrapper = ".scroller-container";
-	var contentDiv = ".scroller-content";
+	var contentWrapper = ".treeslider";
+	var contentDiv = ".treecontent";
 	var easing = "easeInOutQuart";
 
-	// the urlStack is used to determine back/forward popStates
-	var urlStack = new Array();
 	var previousUrl = "";
 			
 
@@ -81,19 +79,23 @@ $(document).ready(function(){
 			return false;
 		}
 
+		// default direction to move content
+		var direction = "left";
+		if($(this).parents('ul').hasClass('breadcrumb')){
+			// breadcrumb links always travel back
+			direction = "right";
+		}
+
 		var url = this.href;
 		// pushes the new url into the History
 		history.pushState({ path: url }, "", url);
 		
-		// if the url is not in the stack yet, insert it
-		if(urlStack.indexOf(url) < 0)
-			urlStack.push(url);
 		// make a record of this as the most recent url
 		previousUrl = url;
 
 		// get new content and move everything left
 		$.get(url, function(data){
-			moveContent("left", data);
+			moveContent(direction, data);
 		});
 		
 		// prevent default click behavior
@@ -107,7 +109,7 @@ $(document).ready(function(){
 		if(state) {
 			var direction = "left";
 			// check the index of the url in the stack, this determines the direction to move the content
-			if(urlStack.indexOf(state.path) < urlStack.indexOf(previousUrl))
+			if(previousUrl.toString().length > state.path.toString().length)
 				direction = "right";
 			previousUrl = state.path;
 		
